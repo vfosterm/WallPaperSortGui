@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.wallpaper_path = None
         self.full_file_path = None
         self.label_2_text = ''
         self.setObjectName('MainWindowObject')
@@ -87,6 +88,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.retranslateUi()
         self.full_file_path = os.path.abspath(file)
 
+    def set_wallpaper_path(self):
+        msgBox = QtWidgets.QMessageBox.question(self,'Set Output Path', "Would you like to use default Path at: \n {} \n Or Set Custom?".format(self.wallpaper_path), QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+
+        if msgBox == QtWidgets.QMessageBox.Yes:
+            pass
+        elif msgBox == QtWidgets.QMessageBox.No:
+            file = str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Wallpaper Sort Folder'))
+            print(file)
+            if os.path.isdir(file):
+                self.wallpaper_path = os.path.abspath(file)
+        else:
+            pass
+
+
     def sort(self):
         print(self.full_file_path)
         print(self.checkBox.isChecked())
@@ -94,22 +109,29 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # sort subfolders and folders
         if self.full_file_path is not None:
-            wallpaper_path = os.path.join(self.full_file_path, 'WallPaper_Sorted')
+            self.wallpaper_path = os.path.join(self.full_file_path, 'WallPaper_Sorted')
+            self.SortButton.hide()
+            self.checkBox.hide()
+            self.openDirectoryBtn.hide()
+            self.progressBar.show()
+            self.set_wallpaper_path()
+            self.label_2_text = "Beginning Sort..."
+            self.retranslateUi()
+            QtCore.QCoreApplication.processEvents()
+
             try:
-                os.mkdir(wallpaper_path)
+                os.mkdir(self.wallpaper_path)
             except FileExistsError:
                 pass
             images = search_folder(self.full_file_path, search_subfolders)
-
             total_images = len(list(search_folder(self.full_file_path, search_subfolders)))
             total_image_count = 0
             image_count = 0
-            self.progressBar.show()
             for image in images:
                 total_image_count += 1
                 self.progressBar.setValue((total_image_count/total_images)*100)
                 if image.resolution in wallpaper_resolutions:
-                    new_path = os.path.join(wallpaper_path, image.resolution)
+                    new_path = os.path.join(self.wallpaper_path, image.resolution)
                     if not os.path.exists(new_path):
                         os.makedirs(new_path)
                         try:
@@ -129,7 +151,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 QtCore.QCoreApplication.processEvents()
             self.label_2.hide()
             if image_count > 0:
-                self.label_2_text = '{} Images sorted to: {}'.format(image_count, wallpaper_path)
+                self.label_2_text = '{} Images sorted to: {}'.format(image_count, self.wallpaper_path)
                 self.label_2.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
                 self.label_2.show()
                 self.retranslateUi()
@@ -140,6 +162,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.retranslateUi()
                 QtCore.QCoreApplication.processEvents()
             self.progressBar.hide()
+            self.SortButton.show()
+            self.checkBox.show()
+            self.openDirectoryBtn.show()
         else:
             self.label_2_text = "No Directory Selected"
             self.label_2.show()
