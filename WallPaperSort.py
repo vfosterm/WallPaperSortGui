@@ -15,6 +15,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+        icon = os.path.join(os.getcwd(), 'preferences-desktop-wallpaper-symbolic.svg')
+        self.setWindowIcon(QtGui.QIcon(icon))
         self.wallpaper_path = None
         self.full_file_path = None
         self.label_2_text = ''
@@ -55,15 +57,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
         self.checkBox.setObjectName("checkBox")
         self.horizontalLayout.addWidget(self.checkBox)
-        spacerItem = QtWidgets.QSpacerItem(16, 16, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
-        self.horizontalLayout.addItem(spacerItem)
+        spacer_item = QtWidgets.QSpacerItem(16, 16, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
+        self.horizontalLayout.addItem(spacer_item)
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setEnabled(True)
         self.label_2.setObjectName("label_2")
         self.label_2.hide()
         self.horizontalLayout.addWidget(self.label_2, 0, QtCore.Qt.AlignLeft)
-        spacerItem1 = QtWidgets.QSpacerItem(16, 16, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
-        self.horizontalLayout.addItem(spacerItem1)
+        spacer_item1 = QtWidgets.QSpacerItem(16, 16, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Expanding)
+        self.horizontalLayout.addItem(spacer_item1)
         self.SortButton = QtWidgets.QPushButton(self.centralwidget)
         self.SortButton.setObjectName("SortButton")
         self.horizontalLayout.addWidget(self.SortButton)
@@ -72,39 +74,37 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
-        self.retranslateUi()
+        self.retranslate_ui()
         self.openDirectoryBtn.clicked.connect(self.get_directory)
         self.SortButton.clicked.connect(self.sort)
-        print(self.full_file_path)
         QtCore.QMetaObject.connectSlotsByName(self)
-
+        self.center_on_screen()
         self.show()
+
+    def center_on_screen(self):
+        resolution = QtWidgets.QDesktopWidget().screenGeometry()
+        self.move(int((resolution.width() / 2) - (self.frameSize().width() / 2)), int((resolution.height() / 2) - (self.frameSize().height() / 2)))
 
     def get_directory(self):
         file = str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Directory to Sort'))
-        print(file)
         self.label_2_text = "Path Set: {}".format(file)
         self.label_2.show()
-        self.retranslateUi()
+        self.retranslate_ui()
         self.full_file_path = os.path.abspath(file)
 
     def set_wallpaper_path(self):
-        msgBox = QtWidgets.QMessageBox.question(self,'Set Output Path', "Would you like to use default Path at: \n {} \n Or Set Custom?".format(self.wallpaper_path), QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        msgBox = QtWidgets.QMessageBox.question(self,'Set Output Path', "Default output path is: \n {} \n would you like to set custom?".format(self.wallpaper_path), QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
 
-        if msgBox == QtWidgets.QMessageBox.Yes:
+        if msgBox == QtWidgets.QMessageBox.No:
             pass
-        elif msgBox == QtWidgets.QMessageBox.No:
+        elif msgBox == QtWidgets.QMessageBox.Yes:
             file = str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Wallpaper Sort Folder'))
-            print(file)
             if os.path.isdir(file):
                 self.wallpaper_path = os.path.abspath(file)
         else:
             pass
 
-
     def sort(self):
-        print(self.full_file_path)
-        print(self.checkBox.isChecked())
         search_subfolders = self.checkBox.isChecked()
 
         # sort subfolders and folders
@@ -116,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.progressBar.show()
             self.set_wallpaper_path()
             self.label_2_text = "Beginning Sort..."
-            self.retranslateUi()
+            self.retranslate_ui()
             QtCore.QCoreApplication.processEvents()
 
             try:
@@ -147,19 +147,19 @@ class MainWindow(QtWidgets.QMainWindow):
                             continue
                 self.label_2_text = "{} out of {} Images Sorted".format(total_image_count, total_images)
                 self.label_2.show()
-                self.retranslateUi()
+                self.retranslate_ui()
                 QtCore.QCoreApplication.processEvents()
             self.label_2.hide()
             if image_count > 0:
                 self.label_2_text = '{} Images sorted to: {}'.format(image_count, self.wallpaper_path)
                 self.label_2.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
                 self.label_2.show()
-                self.retranslateUi()
+                self.retranslate_ui()
                 QtCore.QCoreApplication.processEvents()
             else:
                 self.label_2_text = "No Images Found"
                 self.label_2.show()
-                self.retranslateUi()
+                self.retranslate_ui()
                 QtCore.QCoreApplication.processEvents()
             self.progressBar.hide()
             self.SortButton.show()
@@ -168,10 +168,10 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.label_2_text = "No Directory Selected"
             self.label_2.show()
-            self.retranslateUi()
+            self.retranslate_ui()
             QtCore.QCoreApplication.processEvents()
 
-    def retranslateUi(self):
+    def retranslate_ui(self):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "WallPaperSorT"))
         self.openDirectoryBtn.setText(_translate("MainWindow", "Open Directory"))
@@ -205,7 +205,6 @@ def search_folder(folder, search_subfolders):
 
 
 if __name__ == '__main__':
-    faulthandler.enable()
     app = QtWidgets.QApplication(sys.argv)
     gui = MainWindow()
     sys.exit(app.exec_())
