@@ -2,7 +2,6 @@ import sys
 import os
 import collections
 import shutil
-import faulthandler
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PIL import Image
 
@@ -31,12 +30,13 @@ class MainWindow(QtWidgets.QMainWindow):
         font.setBold(False)
         font.setWeight(50)
         font.setKerning(False)
+        font.setStyleHint(QtGui.QFont.Monospace)
         self.label.setFont(font)
         self.label.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.label.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.label.setLineWidth(1)
         self.label.setText("<html><head/><body><pre style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a name=\"maincontent\"/><span style=\" font-family:\'SF Mono\';\"> _</span><span style=\" font-family:\'SF Mono\';\">_          __   _ _ _____                      _____         _______ </span></pre><pre style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SF Mono\';\"> \\ \\        / /  | | |  __ \\                    / ____|       |__   __|</span></pre><pre style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SF Mono\';\">  \\ \\  /\\  / /_ _| | | |__) |_ _ _ __   ___ _ _| (___   ___  _ __| |   </span></pre><pre style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SF Mono\';\">   \\ \\/  \\/ / _` | | |  ___/ _` | \'_ \\ / _ \\ \'__\\___ \\ / _ \\| \'__| |   </span></pre><pre style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SF Mono\';\">    \\  /\\  / (_| | | | |  | (_| | |_) |  __/ |  ____) | (_) | |  | |   </span></pre><pre style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SF Mono\';\">     \\/  \\/ \\__,_|_|_|_|   \\__,_| .__/ \\___|_| |_____/ \\___/|_|  |_|   </span></pre><pre style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SF Mono\';\">                                | |                                    </span></pre><pre style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'SF Mono\';\">                                |_|                                    </span></pre><p><br/></p></body></html>")
-        self.label.setTextFormat(QtCore.Qt.AutoText)
+        self.label.setTextFormat(QtCore.Qt.RichText)
         self.label.setScaledContents(False)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setWordWrap(False)
@@ -87,6 +87,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def get_directory(self):
         file = str(QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Directory to Sort'))
+        if file is '':
+            self.full_file_path = None
+            return
+
         self.label_2_text = "Path Set: {}".format(file)
         self.label_2.show()
         self.retranslate_ui()
